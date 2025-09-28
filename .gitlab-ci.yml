@@ -1,39 +1,35 @@
 variables:
   UV_VERSION: "0.5"
-  PYTHON_VERSION: "3.12"
+  PYTHON_VERSION: "3.11"
   BASE_LAYER: bookworm-slim
-  # GitLab CI creates a separate mountpoint for the build directory,
-  # so we need to copy instead of using hard links.
   UV_LINK_MODE: copy
+  IMAGE_NAME: darionarvaezuao/ConteoVePa
+  IMAGE_TAG: python-application-v1.0
 
 stages:
   - test
   - build
   - deploy
-  
+
 run_test:
-  stage: test
-  image: "ghcr.io/astral-sh/uv:${UV_VERSION}-python${PYTHON_VERSION}-${BASE_LAYER}"
-  before_script:
-    - apt-get update && apt-get install -y --no-install-recommends make libgl1 libglib2.0-0
-    - uv pip install --system --extra-index-url https://download.pytorch.org/whl/cpu -r requirements-web.txt
-    - uv pip install --system pytest coverage
-  script:
-    - pytest -q tests/test_counter.py tests/test_detector_mapping.py
-
-
-
-
-#docker push ivanrcas/neumonia-ircc-app:tagname
+    stage: test
+    image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
+    before_script:
+      - apt-get update && apt-get install -y make libgl1-mesa-glx libglib2.0-0
+    script:
+        - make test
+    cache:
+      key:
+        files:
+          - requirements.txt
+      paths:
+        - venv/
 
 build_image:
   stage: build
   variables:
-    IMAGE_NAME: ivanrcas/vehiculos-ircc-app
-    IMAGE_TAG: python-application-v1.0
     DOCKER_TLS_CERTDIR: "/certs"
   image: docker:28.4.0-cli
-  # Disponibilizar servicio de docker, o de aplicaciones necesarias según herramientas del proyecto
   services:
     - docker:28.4.0-dind
   before_script:
@@ -42,38 +38,22 @@ build_image:
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
     - docker push $IMAGE_NAME:$IMAGE_TAG
 
-deploy_azure:
+deploy:
   stage: deploy
-  needs: ["build_image"]
-  image: mcr.microsoft.com/azure-cli:2.64.0
-  variables:
-    RG_NAME: rg-vehiculos
-    ACA_ENV: cae-vehiculos
-    ACA_NAME: app-vehiculos
-    IMAGE_REF: "$IMAGE_NAME:$IMAGE_TAG"   # p.ej. ivanrcas/vehiculos-ircc-app:<tag>
-    TARGET_PORT: "8080"
-    INGRESS: "external"
+  image: alpine:latest
   before_script:
-    - az login --service-principal -u "$AZ_CLIENT_ID" -p "$AZ_CLIENT_SECRET" --tenant "$AZ_TENANT_ID"
-    - az account set --subscription "$AZ_SUBSCRIPTION_ID"
+    - apk add --no-cache openssh-client
+    - chmod 400 $SSH_KEY
   script:
-    - |
-      if ! az containerapp show -n "$ACA_NAME" -g "$RG_NAME" >/dev/null 2>&1; then
-        echo "Creando Container App $ACA_NAME..."
-        az containerapp create \
-          -n "$ACA_NAME" -g "$RG_NAME" \
-          --environment "$ACA_ENV" \
-          --image "$IMAGE_REF" \
-          --ingress "$INGRESS" --target-port "$TARGET_PORT" \
-          --cpu 1 --memory 2Gi
-          # Si la imagen de Docker Hub es PRIVADA, descomenta:
-          # --registry-server index.docker.io \
-          # --registry-username "$DOCKERHUB_USER" \
-          # --registry-password "$DOCKERHUB_PASSWORD"
-      else
-        echo "Actualizando imagen de $ACA_NAME a $IMAGE_REF..."
-        az containerapp update -n "$ACA_NAME" -g "$RG_NAME" --image "$IMAGE_REF"
-      fi
-    - az containerapp show -n "$ACA_NAME" -g "$RG_NAME" -o tsv --query properties.configuration.ingress.fqdn
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@138.197.68.195 "
+      set -e && 
+      echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin &&
+      CONTAINER_NAME = 'neumonia-app' &&
+      docker pull $IMAGE_NAME:$IMAGE_TAG &&
+      if [\$(docker ps -q -f name=\$CONTAINER_NAME) ];
+        docker stop \$CONTAINER_NAME;
+        docker rm \$CONTAINER_NAME;
+      fi &&
+      docker run -d -p 5000:5000 --name \$CONTAINER_NAME $IMAGE_NAME:$IMAGE_TAG &&
+      docker image prune -f
+      "
