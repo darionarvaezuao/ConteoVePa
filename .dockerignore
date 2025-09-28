@@ -1,0 +1,71 @@
+# ==========================================================
+# Archivos y carpetas innecesarias para la imagen
+# ==========================================================
+
+# Python cache / compilados
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Testing y herramientas de desarrollo
+tests/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+env/
+
+# Notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# ==========================================================
+# Archivos locales / de usuario
+# ==========================================================
+.DS_Store
+*.log
+*.tmp
+*.bak
+*.swp
+.idea/
+.vscode/
+
+# ==========================================================
+# Datos generados por la aplicación
+# ==========================================================
+reports/
+uploads/
+mlruns/
+*.csv
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# ==========================================================
+# Modelos entrenados / pesos pesados
+# ==========================================================
+*.pt
+*.onnx
+*.h5
+*.ckpt
+
+# ==========================================================
+# Archivos de control de Docker
+# ==========================================================
+docker-compose.override.yml
+*.pid
+*.sock
+

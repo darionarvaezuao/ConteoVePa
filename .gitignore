@@ -1,0 +1,72 @@
+# ==========================================================
+# Archivos y carpetas de Python
+# ==========================================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+*.so
+*.egg
+*.egg-info/
+*.manifest
+*.spec
+
+# Cachés de testing y herramientas
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+env/
+.ipynb_checkpoints/
+
+# ==========================================================
+# Archivos de la aplicación
+# ==========================================================
+reports/           # CSV generados por la app
+uploads/           # Archivos subidos en Streamlit
+mlruns/            # Experimentos locales de MLflow
+*.csv              # Evita subir datos de prueba
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# ==========================================================
+# Configuración de desarrollo
+# ==========================================================
+.DS_Store
+*.log
+*.swp
+.idea/
+.vscode/
+*.bak
+*.tmp
+
+# ==========================================================
+# Docker
+# ==========================================================
+*.pid
+*.sock
+docker-compose.override.yml
+
+# ==========================================================
+# Modelos entrenados / pesos pesados
+# ==========================================================
+*.pt
+*.onnx
+*.h5
+*.ckpt
+
+# ==========================================================
+# Otros
+# ==========================================================
+# Ignorar archivos generados accidentalmente
+*~
+

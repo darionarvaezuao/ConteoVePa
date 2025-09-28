@@ -1,0 +1,3 @@
+﻿timestamp;evento;clase;car_in;car_out;moto_in;moto_out;car_inv;moto_inv;modelo;conf;orientacion;pos_linea;invertido;fuente
+2025-09-28T14:41:51.875466;IN;motorcycle;0;0;1;0;7;5;yolo11n.pt;0.30;horizontal;0.60;False;C:\Users\nemes\Documents\Especializacion IA\Proyectos IA\proyecto final\Final\Ivan\contador-de-vehiculos-uao-main\uploads\20250928_144143_9.mp4
+2025-09-28T14:42:23.762866;SUMMARY;-;0;0;1;0;7;5;yolo11n.pt;0.30;horizontal;0.60;False;C:\Users\nemes\Documents\Especializacion IA\Proyectos IA\proyecto final\Final\Ivan\contador-de-vehiculos-uao-main\uploads\20250928_144143_9.mp4
