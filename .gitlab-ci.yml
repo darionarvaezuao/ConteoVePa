@@ -3,41 +3,54 @@ variables:
   PYTHON_VERSION: "3.11"
   BASE_LAYER: bookworm-slim
   UV_LINK_MODE: copy
-  IMAGE_NAME: darionarvaezuao/ConteoVePa
+  IMAGE_NAME: nemesi800/conteovepa     
   IMAGE_TAG: python-application-v1.0
+  UV_CACHE_DIR: .uv_cache
 
 stages:
   - test
   - build
   - deploy
 
+# ==========================
+# TEST
+# ==========================
 run_test:
-    stage: test
-    image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
-    before_script:
-      - apt-get update && apt-get install -y make libgl1-mesa-glx libglib2.0-0
-    script:
-        - make test
-    cache:
-      key:
-        files:
-          - requirements.txt
-      paths:
-        - venv/
+  stage: test
+  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
+  before_script:
+    - apt-get update && apt-get install -y make libgl1-mesa-glx libglib2.0-0
+  script:
+    - make test
+  cache:
+    key:
+      files:
+        - requirements.txt
+    paths:
+      - ${UV_CACHE_DIR}
+      - .ultralytics_cache
+      - .pytest_cache
 
+# ==========================
+# BUILD
+# ==========================
 build_image:
   stage: build
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
   image: docker:28.4.0-cli
   services:
     - docker:28.4.0-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
   before_script:
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
   script:
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
     - docker push $IMAGE_NAME:$IMAGE_TAG
 
+# ==========================
+# DEPLOY
+# ==========================
 deploy:
   stage: deploy
   image: alpine:latest
@@ -46,14 +59,14 @@ deploy:
     - chmod 400 $SSH_KEY
   script:
     - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@138.197.68.195 "
-      set -e && 
-      echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin &&
-      CONTAINER_NAME = 'neumonia-app' &&
-      docker pull $IMAGE_NAME:$IMAGE_TAG &&
-      if [\$(docker ps -q -f name=\$CONTAINER_NAME) ];
-        docker stop \$CONTAINER_NAME;
-        docker rm \$CONTAINER_NAME;
-      fi &&
-      docker run -d -p 5000:5000 --name \$CONTAINER_NAME $IMAGE_NAME:$IMAGE_TAG &&
-      docker image prune -f
+        set -e
+        echo \"$REGISTRY_PASSWORD\" | docker login -u \"$REGISTRY_USER\" --password-stdin
+        CONTAINER_NAME=conteo-app
+        docker pull $IMAGE_NAME:$IMAGE_TAG
+        if [ \$(docker ps -q -f name=\$CONTAINER_NAME) ]; then
+          docker stop \$CONTAINER_NAME
+          docker rm \$CONTAINER_NAME
+        fi
+        docker run -d -p 8501:8501 --name \$CONTAINER_NAME $IMAGE_NAME:$IMAGE_TAG
+        docker image prune -f
       "
