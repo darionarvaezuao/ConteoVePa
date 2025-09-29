@@ -72,6 +72,6 @@ deploy:
           docker stop \$CONTAINER_NAME
           docker rm \$CONTAINER_NAME
         fi
-        docker run -d -p 8501:8501 --name \$CONTAINER_NAME $APP_IMAGE_URL:$IMAGE_TAG
+        docker run -d -p 8501:8080 --name \$CONTAINER_NAME $APP_IMAGE_URL:$IMAGE_TAG
         docker image prune -f
       EOF
