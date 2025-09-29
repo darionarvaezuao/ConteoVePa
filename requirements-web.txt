@@ -1,23 +1,15 @@
-# ---- Núcleo Web Ligero ----
-numpy>=1.24
-pillow>=10.0.0
-opencv-python-headless>=4.9.0
-streamlit>=1.38
-pandas>=2.0
+# 1. Le dice a pip/uv que busque en el repositorio de PyTorch para CPU.
+#    Esta es la línea MÁS IMPORTANTE para mantener la imagen ligera.
+--extra-index-url https://download.pytorch.org/whl/cpu
 
+# 2. El cerebro de la aplicación para detectar vehículos.
+#    Ultralytics instalará automáticamente las versiones correctas
+#    y ligeras de torch y torchvision gracias a la línea anterior.
+ultralytics
 
-
-
-# ---- Núcleo del pipeline (CPU) ----
-#ultralytics>=8.3.0
-#supervision>=0.19.0
-#numpy>=1.24
-#pillow>=10.0.0
-#opencv-python-headless>=4.9.0
-
-# ---- UI Web ----
-#streamlit>=1.38
-
-# ---- PyTorch (se instalará como CPU vía --extra-index-url en pip/uv) ----
-#torch==2.*
-#torchvision==0.*
+# 3. Librerías para la interfaz web y el manejo de datos/imágenes.
+streamlit
+pandas
+opencv-python-headless
+numpy
+pillow
