@@ -3,7 +3,7 @@ variables:
   PYTHON_VERSION: "3.11"
   BASE_LAYER: bookworm-slim
   UV_LINK_MODE: copy
-  IMAGE_NAME: nemesis800/conteovepa     
+  IMAGE_NAME: nemesis800/conteovepa      
   IMAGE_TAG: python-application-v1.0
   UV_CACHE_DIR: .uv_cache
 
@@ -20,19 +20,16 @@ run_test:
   image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
   before_script:
     - apt-get update && apt-get install -y make libgl1-mesa-glx libglib2.0-0
-    # crear entorno virtual
     - uv venv
     - source .venv/bin/activate
   script:
-    # instalar solo dependencias web
-    - uv pip install -r requirements-web.txt
+    - uv pip install -r requirements-web.txt -r requirements-dev.txt
     - make test
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - ${UV_CACHE_DIR}
       - .pytest_cache
-      - .venv
 
 # ==========================
 # BUILD
@@ -48,7 +45,6 @@ build_image:
   before_script:
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
   script:
-    # usa el requirements completo dentro del Dockerfile
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
     - docker push $IMAGE_NAME:$IMAGE_TAG
 
@@ -62,23 +58,18 @@ deploy:
     - apk add --no-cache openssh-client
     - echo "$SSH_KEY" > id_rsa
     - chmod 400 id_rsa
-script:
-  - |
-    ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 "
-      export REGISTRY_USER='$REGISTRY_USER'
-      export REGISTRY_PASSWORD='$REGISTRY_PASSWORD'
-      export IMAGE_NAME='$IMAGE_NAME'
-      export IMAGE_TAG='$IMAGE_TAG'
-
-      set -e
-      echo \$REGISTRY_PASSWORD | docker login -u \$REGISTRY_USER --password-stdin
-      CONTAINER_NAME=conteo-app
-      docker pull \$IMAGE_NAME:\$IMAGE_TAG
-      if [ \$(docker ps -q -f name=\$CONTAINER_NAME) ]; then
-        docker stop \$CONTAINER_NAME
-        docker rm \$CONTAINER_NAME
-      fi
-      docker run -d -p 8501:8501 --name \$CONTAINER_NAME \$IMAGE_NAME:\$IMAGE_TAG
-      docker image prune -f
-    "
-    
+  script:
+    - |
+      ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 << EOF
+        set -e
+        echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
+        CONTAINER_NAME=conteo-app
+        docker pull $IMAGE_NAME:$IMAGE_TAG
+        # Escapamos el signo de dólar para que se evalúe en el servidor remoto
+        if [ \$(docker ps -q -f name=\$CONTAINER_NAME) ]; then
+          docker stop \$CONTAINER_NAME
+          docker rm \$CONTAINER_NAME
+        fi
+        docker run -d -p 8501:8501 --name \$CONTAINER_NAME \$IMAGE_NAME:\$IMAGE_TAG
+        docker image prune -f
+      EOF
