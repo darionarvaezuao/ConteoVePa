@@ -63,15 +63,16 @@ deploy:
     - echo "$SSH_KEY" > id_rsa
     - chmod 400 id_rsa
   script:
-    - ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 "
+    - |
+      ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 << 'EOF'
         set -e
-        echo \"$REGISTRY_PASSWORD\" | docker login -u \"$REGISTRY_USER\" --password-stdin
+        echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
         CONTAINER_NAME=conteo-app
         docker pull $IMAGE_NAME:$IMAGE_TAG
-        if [ \$(docker ps -q -f name=\$CONTAINER_NAME) ]; then
-          docker stop \$CONTAINER_NAME
-          docker rm \$CONTAINER_NAME
+        if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
+          docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
         fi
-        docker run -d -p 8501:8501 --name \$CONTAINER_NAME $IMAGE_NAME:$IMAGE_TAG
+        docker run -d -p 8501:8501 --name $CONTAINER_NAME $IMAGE_NAME:$IMAGE_TAG
         docker image prune -f
-      "
+      EOF
