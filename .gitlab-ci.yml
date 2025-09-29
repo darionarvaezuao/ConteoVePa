@@ -20,8 +20,11 @@ run_test:
   image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
   before_script:
     - apt-get update && apt-get install -y make libgl1-mesa-glx libglib2.0-0
+    # crear entorno virtual
+    - uv venv
+    - source .venv/bin/activate
   script:
-    # instalar solo las dependencias web
+    # instalar solo dependencias web
     - uv pip install -r requirements-web.txt
     - make test
   cache:
@@ -29,6 +32,7 @@ run_test:
     paths:
       - ${UV_CACHE_DIR}
       - .pytest_cache
+      - .venv
 
 # ==========================
 # BUILD
@@ -56,9 +60,10 @@ deploy:
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client
-    - chmod 400 $SSH_KEY
+    - echo "$SSH_KEY" > id_rsa
+    - chmod 400 id_rsa
   script:
-    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@138.197.68.195 "
+    - ssh -o StrictHostKeyChecking=no -i id_rsa root@138.197.68.195 "
         set -e
         echo \"$REGISTRY_PASSWORD\" | docker login -u \"$REGISTRY_USER\" --password-stdin
         CONTAINER_NAME=conteo-app
