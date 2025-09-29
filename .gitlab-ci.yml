@@ -3,7 +3,8 @@ variables:
   PYTHON_VERSION: "3.11"
   BASE_LAYER: bookworm-slim
   UV_LINK_MODE: copy
-  IMAGE_NAME: nemesis800/conteovepa
+  # CAMBIO 1: Se renombró la variable para evitar el enmascaramiento de GitLab.
+  APP_IMAGE_URL: nemesis800/conteovepa
   IMAGE_TAG: python-application-v1.0
   UV_CACHE_DIR: .uv_cache
 
@@ -45,8 +46,9 @@ build_image:
   before_script:
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
   script:
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
-    - docker push $IMAGE_NAME:$IMAGE_TAG
+    # CAMBIO 2: Se usa la nueva variable APP_IMAGE_URL.
+    - docker build -t $APP_IMAGE_URL:$IMAGE_TAG .
+    - docker push $APP_IMAGE_URL:$IMAGE_TAG
 
 # ==========================
 # DEPLOY
@@ -60,21 +62,16 @@ deploy:
     - chmod 400 id_rsa
   script:
     - |
-      # ==========================================================
-      # LÍNEA DE DEPURACIÓN PARA VER EL VALOR REAL DE LA VARIABLE
-      # ==========================================================
-      echo "Debug: El nombre de la imagen es -->$IMAGE_NAME<--"
-      
-      # El resto de tu script de despliegue no cambia
       ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 << EOF
         set -e
         echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
         CONTAINER_NAME=conteo-app
-        docker pull $IMAGE_NAME:$IMAGE_TAG
+        # CAMBIO 3: Se usa la nueva variable en el script de despliegue.
+        docker pull $APP_IMAGE_URL:$IMAGE_TAG
         if [ \$(docker ps -q -f name=\$CONTAINER_NAME) ]; then
           docker stop \$CONTAINER_NAME
           docker rm \$CONTAINER_NAME
         fi
-        docker run -d -p 8501:8501 --name \$CONTAINER_NAME \$IMAGE_NAME:\$IMAGE_TAG
+        docker run -d -p 8501:8501 --name \$CONTAINER_NAME $APP_IMAGE_URL:$IMAGE_TAG
         docker image prune -f
       EOF
