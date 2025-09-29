@@ -63,7 +63,7 @@ deploy:
     - echo "$SSH_KEY" > id_rsa
     - chmod 400 id_rsa
   script:
-    - ssh -o StrictHostKeyChecking=no -i id_rsa root@138.197.68.195 "
+    - ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 "
         set -e
         echo \"$REGISTRY_PASSWORD\" | docker login -u \"$REGISTRY_USER\" --password-stdin
         CONTAINER_NAME=conteo-app
