@@ -60,12 +60,17 @@ deploy:
     - chmod 400 id_rsa
   script:
     - |
+      # ==========================================================
+      # LÍNEA DE DEPURACIÓN PARA VER EL VALOR REAL DE LA VARIABLE
+      # ==========================================================
+      echo "Debug: El nombre de la imagen es -->$IMAGE_NAME<--"
+      
+      # El resto de tu script de despliegue no cambia
       ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 << EOF
         set -e
         echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
         CONTAINER_NAME=conteo-app
         docker pull $IMAGE_NAME:$IMAGE_TAG
-        # Escapamos el signo de dólar para que se evalúe en el servidor remoto
         if [ \$(docker ps -q -f name=\$CONTAINER_NAME) ]; then
           docker stop \$CONTAINER_NAME
           docker rm \$CONTAINER_NAME
@@ -73,4 +78,3 @@ deploy:
         docker run -d -p 8501:8501 --name \$CONTAINER_NAME \$IMAGE_NAME:\$IMAGE_TAG
         docker image prune -f
       EOF
-    
