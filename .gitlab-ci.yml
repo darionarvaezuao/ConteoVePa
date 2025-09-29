@@ -62,17 +62,23 @@ deploy:
     - apk add --no-cache openssh-client
     - echo "$SSH_KEY" > id_rsa
     - chmod 400 id_rsa
-  script:
-    - |
-      ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 << 'EOF'
-        set -e
-        echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
-        CONTAINER_NAME=conteo-app
-        docker pull $IMAGE_NAME:$IMAGE_TAG
-        if [ $(docker ps -q -f name=$CONTAINER_NAME) ]; then
-          docker stop $CONTAINER_NAME
-          docker rm $CONTAINER_NAME
-        fi
-        docker run -d -p 8501:8501 --name $CONTAINER_NAME $IMAGE_NAME:$IMAGE_TAG
-        docker image prune -f
-      EOF
+script:
+  - |
+    ssh -o StrictHostKeyChecking=no -i id_rsa root@45.55.177.84 "
+      export REGISTRY_USER='$REGISTRY_USER'
+      export REGISTRY_PASSWORD='$REGISTRY_PASSWORD'
+      export IMAGE_NAME='$IMAGE_NAME'
+      export IMAGE_TAG='$IMAGE_TAG'
+
+      set -e
+      echo \$REGISTRY_PASSWORD | docker login -u \$REGISTRY_USER --password-stdin
+      CONTAINER_NAME=conteo-app
+      docker pull \$IMAGE_NAME:\$IMAGE_TAG
+      if [ \$(docker ps -q -f name=\$CONTAINER_NAME) ]; then
+        docker stop \$CONTAINER_NAME
+        docker rm \$CONTAINER_NAME
+      fi
+      docker run -d -p 8501:8501 --name \$CONTAINER_NAME \$IMAGE_NAME:\$IMAGE_TAG
+      docker image prune -f
+    "
+
