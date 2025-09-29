@@ -1,13 +1,13 @@
-# 1. Le dice a pip/uv que busque en el repositorio de PyTorch para CPU.
-#    Esta es la línea MÁS IMPORTANTE para mantener la imagen ligera.
+# URL para instalar PyTorch solo para CPU
 --extra-index-url https://download.pytorch.org/whl/cpu
 
-# 2. El cerebro de la aplicación para detectar vehículos.
-#    Ultralytics instalará automáticamente las versiones correctas
-#    y ligeras de torch y torchvision gracias a la línea anterior.
+# Cerebro de la aplicación
 ultralytics
 
-# 3. Librerías para la interfaz web y el manejo de datos/imágenes.
+# CAMBIO: Se añadió la librería que faltaba
+supervision
+
+# Librerías para la interfaz y manejo de datos
 streamlit
 pandas
 opencv-python-headless
