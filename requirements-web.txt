@@ -1,13 +1,23 @@
-# ---- Núcleo del pipeline (CPU) ----
-ultralytics>=8.3.0
-supervision>=0.19.0
+# ---- Núcleo Web Ligero ----
 numpy>=1.24
 pillow>=10.0.0
 opencv-python-headless>=4.9.0
+streamlit>=1.38
+pandas>=2.0
+
+
+
+
+# ---- Núcleo del pipeline (CPU) ----
+#ultralytics>=8.3.0
+#supervision>=0.19.0
+#numpy>=1.24
+#pillow>=10.0.0
+#opencv-python-headless>=4.9.0
 
 # ---- UI Web ----
-streamlit>=1.38
+#streamlit>=1.38
 
 # ---- PyTorch (se instalará como CPU vía --extra-index-url en pip/uv) ----
-torch==2.*
-torchvision==0.*
+#torch==2.*
+#torchvision==0.*

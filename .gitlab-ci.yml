@@ -21,14 +21,13 @@ run_test:
   before_script:
     - apt-get update && apt-get install -y make libgl1-mesa-glx libglib2.0-0
   script:
+    # instalar solo las dependencias web
+    - uv pip install -r requirements-web.txt
     - make test
   cache:
-    key:
-      files:
-        - requirements.txt
+    key: ${CI_COMMIT_REF_SLUG}
     paths:
       - ${UV_CACHE_DIR}
-      - .ultralytics_cache
       - .pytest_cache
 
 # ==========================
@@ -45,6 +44,7 @@ build_image:
   before_script:
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
   script:
+    # usa el requirements completo dentro del Dockerfile
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
     - docker push $IMAGE_NAME:$IMAGE_TAG
 
