@@ -17,37 +17,39 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-# 🚀 Opción 2: Mock winsound en Linux
+# 🚀 Opción 2: Mock winsound en Linux para evitar ImportError
 if sys.platform != "win32":
     sys.modules['winsound'] = types.SimpleNamespace(Beep=lambda freq, dur: None)
 
 
 def test_winsound_beep_on_windows():
     """Test winsound_beep cuando winsound está disponible (Windows)."""
-    # Mock del módulo winsound
     mock_winsound = MagicMock()
     mock_winsound.Beep = MagicMock()
 
-    with patch.dict('sys.modules', {'winsound': mock_winsound}):
-        import importlib
-        import utils
-        importlib.reload(utils)
-        from utils import winsound_beep
+    # Forzamos plataforma Windows y cargamos el mock
+    with patch('sys.platform', 'win32'):
+        with patch.dict('sys.modules', {'winsound': mock_winsound}):
+            import importlib
+            import utils
+            importlib.reload(utils)
+            from utils import winsound_beep
 
-        # Llamamos a la función
-        winsound_beep(1000, 200)
+            winsound_beep(1000, 200)
 
-        # Verificamos que se llamó Beep con los parámetros correctos
-        mock_winsound.Beep.assert_called_once_with(1000, 200)
+            mock_winsound.Beep.assert_called_once_with(1000, 200)
 
 
 def test_winsound_beep_on_non_windows():
     """Test winsound_beep en plataforma no-Windows (simulado)."""
     with patch('sys.platform', 'linux'):
+        import importlib
+        import utils
+        importlib.reload(utils)
         from utils import winsound_beep
         try:
             winsound_beep(1500, 300)
-            assert True  # No debe fallar
+            assert True
         except Exception as e:
             pytest.fail(f"winsound_beep no debería fallar en plataformas no-Windows: {e}")
 
@@ -57,29 +59,32 @@ def test_winsound_beep_exception_handling():
     mock_winsound = MagicMock()
     mock_winsound.Beep = MagicMock(side_effect=RuntimeError("Error de audio"))
 
-    with patch.dict('sys.modules', {'winsound': mock_winsound}):
-        import importlib
-        import utils
-        importlib.reload(utils)
-        from utils import winsound_beep
+    with patch('sys.platform', 'win32'):
+        with patch.dict('sys.modules', {'winsound': mock_winsound}):
+            import importlib
+            import utils
+            importlib.reload(utils)
+            from utils import winsound_beep
 
-        try:
-            winsound_beep(1000, 200)
-            assert True
-        except Exception:
-            pytest.fail("winsound_beep no manejó la excepción correctamente")
+            try:
+                winsound_beep(1000, 200)
+                assert True
+            except Exception:
+                pytest.fail("winsound_beep no manejó la excepción correctamente")
 
 
 def test_winsound_beep_with_zero_params():
     """Test winsound_beep con parámetros cero."""
     mock_winsound = MagicMock()
 
-    with patch.dict('sys.modules', {'winsound': mock_winsound}):
-        import importlib
-        import utils
-        importlib.reload(utils)
-        from utils import winsound_beep
+    with patch('sys.platform', 'win32'):
+        with patch.dict('sys.modules', {'winsound': mock_winsound}):
+            import importlib
+            import utils
+            importlib.reload(utils)
+            from utils import winsound_beep
 
-        winsound_beep(0, 0)
+            winsound_beep(0, 0)
 
-        mock_winsound.Beep.assert_called_once_with(0, 0)
+            mock_winsound.Beep.assert_called_once_with(0, 0)
+
