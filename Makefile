@@ -103,7 +103,7 @@ docker-run-cli:
 ## Ejecutar tests con pytest (modo simple)
 test:
 	@echo "[Make] Ejecutando tests..."
-	uv run -m pytest -q
+	uv run -m pytest -q --disable-warnings --maxfail=1
 
 ## Ejecutar tests con más detalle
 test-verbose:
