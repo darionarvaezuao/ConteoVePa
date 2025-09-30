@@ -79,7 +79,7 @@ def _init_session() -> None:
 # ----------------------------------------------------------------------
 _init_session()
 st.set_page_config(page_title="Conteo de Vehículos", layout="centered")
-st.title("🚗 Detección y Conteo de Vehículos (Streamlit)-Ocean")
+st.title("🚗 Detección y Conteo de Vehículos (Streamlit)-Ocean V2")
 
 # ----------------------------------------------------------------------
 # Sidebar con parámetros de ejecución

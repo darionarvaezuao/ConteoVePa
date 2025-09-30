@@ -3,7 +3,6 @@ variables:
   PYTHON_VERSION: "3.11"
   BASE_LAYER: bookworm-slim
   UV_LINK_MODE: copy
-  # CAMBIO 1: Se renombró la variable para evitar el enmascaramiento de GitLab.
   APP_IMAGE_URL: nemesis800/conteovepa
   IMAGE_TAG: python-application-v1.0
   UV_CACHE_DIR: .uv_cache

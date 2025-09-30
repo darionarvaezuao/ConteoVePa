@@ -1,0 +1,28 @@
+# Usamos la misma base que tu Dockerfile de producción
+FROM python:3.12-slim
+
+# Mismas buenas prácticas
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DEFAULT_TIMEOUT=120
+
+# Mismas dependencias del sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    make libgl1 libglib2.0-0 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copia TODOS los archivos de requerimientos
+COPY requirements-web.txt requirements-dev.txt ./
+
+# Instala TODAS las dependencias (web y dev)
+# Apuntamos al repo de PyTorch CPU-only para que la imagen no sea tan pesada
+RUN pip install --no-cache-dir \
+    --extra-index-url https://download.pytorch.org/whl/cpu \
+    --retries 10 --timeout 120 \
+    -r requirements-web.txt -r requirements-dev.txt
+
+# Dejamos un comando por defecto, no se usará en el CI pero es buena práctica
+CMD ["/bin/bash"]
