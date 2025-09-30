@@ -45,7 +45,6 @@ build_image:
   before_script:
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
   script:
-    # CAMBIO 2: Se usa la nueva variable APP_IMAGE_URL.
     - docker build -t $APP_IMAGE_URL:$IMAGE_TAG .
     - docker push $APP_IMAGE_URL:$IMAGE_TAG
 
