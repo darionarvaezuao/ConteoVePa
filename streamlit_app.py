@@ -3,7 +3,7 @@
 Aplicación Streamlit para detección y conteo de vehículos.
 """
 
-from __future-_ import annotations
+from __future__ import annotations
 
 import os
 import sys
