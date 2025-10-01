@@ -13,3 +13,6 @@ pandas
 opencv-python-headless
 numpy
 pillow
+
+# CAMBIO: Añade la librería para video en tiempo real
+streamlit-webrtc
