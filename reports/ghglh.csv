@@ -1,6 +1,0 @@
-﻿timestamp;evento;clase;car_in;car_out;moto_in;moto_out;car_inv;moto_inv;modelo;conf;orientacion;pos_linea;invertido;fuente
-2025-09-28T17:28:33.715262;IN;car;1;0;0;0;3;2;yolo11n.pt;0.30;horizontal;0.50;False;C:\Users\nemes\Documents\Especializacion IA\Proyectos IA\proyecto final\Final\Ivan\contador-de-vehiculos-uao-main\uploads\20250928_172828_10.mp4
-2025-09-28T17:28:40.880559;IN;car;1;0;0;0;4;2;yolo11n.pt;0.30;horizontal;0.50;False;C:\Users\nemes\Documents\Especializacion IA\Proyectos IA\proyecto final\Final\Ivan\contador-de-vehiculos-uao-main\uploads\20250928_172828_10.mp4
-2025-09-28T17:28:43.189834;OUT;car;0;1;0;0;3;2;yolo11n.pt;0.30;horizontal;0.50;False;C:\Users\nemes\Documents\Especializacion IA\Proyectos IA\proyecto final\Final\Ivan\contador-de-vehiculos-uao-main\uploads\20250928_172828_10.mp4
-2025-09-28T17:28:44.321654;IN;car;1;0;0;0;4;2;yolo11n.pt;0.30;horizontal;0.50;False;C:\Users\nemes\Documents\Especializacion IA\Proyectos IA\proyecto final\Final\Ivan\contador-de-vehiculos-uao-main\uploads\20250928_172828_10.mp4
-2025-09-28T17:28:50.743639;SUMMARY;-;3;1;0;0;4;2;yolo11n.pt;0.30;horizontal;0.50;False;C:\Users\nemes\Documents\Especializacion IA\Proyectos IA\proyecto final\Final\Ivan\contador-de-vehiculos-uao-main\uploads\20250928_172828_10.mp4
